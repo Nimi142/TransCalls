@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TransCalls</string>
+    <string name="import_label">Import</string>
+    <string name="export_label">Export</string>
+    <string name="export_success">Logs Saved Successfully!</string>
+    <string name="import_success">Import Success</string>
+    <string name="export_failed_no_logs">Export Failed due to the logs being empty.</string>
+    <string name="build_version">Build Version:</string>
+</resources>
