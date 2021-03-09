@@ -6,4 +6,12 @@
     <string name="import_success">Import Success</string>
     <string name="export_failed_no_logs">Export Failed due to the logs being empty.</string>
     <string name="build_version">Build Version:</string>
+    <string name="ok">OK</string>
+    <string name="permission_dialog_title">"Permission Request "</string>
+    <string name="permission_dialog_content">"To function as intended, TransCalls needs permission to access the device call history. You will now be prompted with a request for access. "</string>
+    <string name="export_failed_no_permisssions">Export failed due to lack of permissions</string>
+    <string name="import_failed_no_permissions">Import failed due to lack of permissions</string>
+    <string name="github_page_link_desc">GitHub Page Link</string>
+    <string name="explanation_text">Export/import the phone\'s call log to/from a file.\nWhen importing an exported call log file, the exported calls are added to the current call log.</string>
+    <string name="permissions_not_granted">! This app lacks pemissions to function properly, click here to ask again.</string>
 </resources>

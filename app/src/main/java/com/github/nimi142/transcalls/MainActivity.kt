@@ -6,11 +6,18 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import android.text.Html
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,17 +32,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // Setting action bar to app color
+        Log.v("CallLogs", "Action Bar: $supportActionBar")
+//        supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#3F3FBF")))
         // Request permissions
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Alert user
-                // Request permissions
-                ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG),
-                        1)
-            }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            // Alert user
+            AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.permission_dialog_title))
+                    .setMessage(getString(R.string.permission_dialog_content))
+                    .setPositiveButton(getString(R.string.ok)) { _, _ -> }
+                    .setOnDismissListener { _ ->
+                        Log.v("CallLogs", "Alert Dialog was dismissed")
+                        // User saw build dialog, asking for required permissions
+                        ActivityCompat.requestPermissions(this,
+                                arrayOf(Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG),
+                                1)
+                    }
+                    .show()
         }
-
 
         try {
             val pInfo: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
@@ -48,6 +63,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun chooseImportFile(v: View) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(applicationContext, getString(R.string.import_failed_no_permissions), Toast.LENGTH_LONG).show()
+            Log.e("CallLogs", "Couldn't import file to CallLogs due to lack of permissions")
+            return
+        }
         val intent = Intent()
                 .setType("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT)
@@ -77,9 +97,13 @@ class MainActivity : AppCompatActivity() {
                 logs.add(currentRow)
             }
             c.close()
-        }
-        catch (e: IndexOutOfBoundsException) {
+        } catch (e: SecurityException) {
+            Toast.makeText(applicationContext, getString(R.string.export_failed_no_permisssions), Toast.LENGTH_LONG).show()
+            Log.e("CallLogs", "Couldn't export logs due to lack of permissions")
+            return
+        } catch (e: IndexOutOfBoundsException) {
             Toast.makeText(applicationContext, getString(R.string.export_failed_no_logs), Toast.LENGTH_LONG).show()
+            return
         }
 
         // Save logs
@@ -144,40 +168,86 @@ class MainActivity : AppCompatActivity() {
             }
             contentValuesList.add(newContentValues)
         }
-        applicationContext.contentResolver.bulkInsert(allCalls, contentValuesList.toTypedArray())
+        try {
+            applicationContext.contentResolver.bulkInsert(allCalls, contentValuesList.toTypedArray())
+        } catch (e: SecurityException) {
+            return
+        }
         Toast.makeText(applicationContext, getString(R.string.import_success), Toast.LENGTH_LONG).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 2 && resultCode == RESULT_OK) {
-            val selectedfile: Uri? = data?.data // URI Location
-            importFromFile(selectedfile!!)
+        if (resultCode != RESULT_OK) {
+            return
         }
-        if (requestCode == 3 && resultCode == RESULT_OK) {
-            val resUri: Uri = data!!.data!!
-            try {
-                contentResolver.openFileDescriptor(resUri, "w")?.use { descriptor ->
-                    FileOutputStream(descriptor.fileDescriptor).use {
-                        val outStream= ObjectOutputStream(it)
-                        outStream.writeObject(logs)
-                        outStream.close()
-                        it.close()
-                    }
-                }
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-            } catch (e: IOException) {
-                e.printStackTrace()
+        when (requestCode) {
+            // Returning from app system settings
+            1 -> {
+                Log.v("CallLogs", "User returned from settings")
+            }
+            // File to import was chosen
+            2 -> {
+                val selectedfile: Uri? = data?.data // URI Location
+                importFromFile(selectedfile!!)
             }
 
-            Toast.makeText(this, getString(R.string.export_success), Toast.LENGTH_LONG).show()
+            // Log file to write to was created
+            3 -> {
+                val resUri: Uri = data!!.data!!
+                try {
+                    contentResolver.openFileDescriptor(resUri, "w")?.use { descriptor ->
+                        FileOutputStream(descriptor.fileDescriptor).use {
+                            val outStream = ObjectOutputStream(it)
+                            outStream.writeObject(logs)
+                            outStream.close()
+                            it.close()
+                        }
+                    }
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+                Toast.makeText(this, getString(R.string.export_success), Toast.LENGTH_LONG).show()
+
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            // Permission Dialog was answered
+            1 -> {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+                    val textButtonPermissions = findViewById<TextView>(R.id.fixPermissionsText)
+                    textButtonPermissions.visibility = View.VISIBLE
+                    textButtonPermissions.isClickable = true
+                }
+            }
         }
     }
 
     fun openGitHub(v: View) {
-        val uri = Uri.parse("")
+        val uri = Uri.parse("https://github.com/Nimi142/TransCalls")
         val intent = Intent(Intent.ACTION_VIEW, uri)
         startActivity(intent)
+    }
+
+    fun openPermissionSettings(v: View) {
+        startActivityForResult(Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS), 1)
+    }
+
+    override fun onResume() {
+        val textButtonPermissions = findViewById<TextView>(R.id.fixPermissionsText)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            textButtonPermissions.visibility = View.VISIBLE
+            textButtonPermissions.isClickable = true
+        } else {
+            textButtonPermissions.visibility = View.INVISIBLE
+            textButtonPermissions.isClickable = false
+        }
+        super.onResume()
     }
 }

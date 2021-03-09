@@ -6,26 +6,61 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/importButton"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/explanationText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200sp"
-        android:onClick="chooseImportFile"
-        android:text="@string/import_label"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/explanation_text"/>
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/explanationText">
 
-    <Button
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/importButton"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:onClick="chooseImportFile"
+            android:text="@string/import_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteY="200dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_weight="1"
+            android:onClick="exportLogs"
+            android:text="@string/export_label"
+            app:layout_constraintEnd_toStartOf="@+id/importButton"
+            tools:layout_editor_absoluteY="248dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/fixPermissionsText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200sp"
-        android:onClick="exportLogs"
-        android:text="@string/export_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importButton" />
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@id/buttonLayout"
+        android:textColor="@color/design_default_color_error"
+        android:visibility="invisible"
+        android:clickable="false"
+        android:onClick="openPermissionSettings"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/permissions_not_granted" />
 
     <TextView
         android:id="@+id/buildVersionLabel"
@@ -36,12 +71,14 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/github_mark"
-        android:scaleType="fitXY"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="@null"
+        android:contentDescription="@string/github_page_link_desc"
+        android:onClick="openGitHub"
+        android:scaleType="fitXY"
+        android:src="@drawable/github_mark"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

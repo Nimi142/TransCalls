@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Button" parent="TextAppearance.AppCompat.Button">
+        <item name="android:background">@color/design_default_color_primary</item>
+    </style>
+    <style name="defTheme" parent="@style/Theme.AppCompat.DayNight">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/app_blue</item>
+        <item name="android:background">@color/app_blue</item>
+        <item name="titleTextStyle">@style/titleTextStyle</item>
+        <item name="android:titleTextStyle">@style/titleTextStyle</item>
+    </style>
+    <style name="titleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/white</item>
+    </style>
+</resources>
