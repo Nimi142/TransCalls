@@ -14,5 +14,12 @@
 .cxx
 local.properties
 
+# Key store
+keystore.jks
+
+# Build files
+app/release
+app/debug
+app/build/
 # Android Studio file
 .idea/
