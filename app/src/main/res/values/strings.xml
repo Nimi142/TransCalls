@@ -5,7 +5,7 @@
     <string name="export_success">Logs Saved Successfully!</string>
     <string name="import_success">Import Success</string>
     <string name="export_failed_no_logs">Export Failed due to the logs being empty.</string>
-    <string name="build_version">Build Version:</string>
+    <string name="build_version">Version:</string>
     <string name="ok">OK</string>
     <string name="permission_dialog_title">"Permission Request "</string>
     <string name="permission_dialog_content">"To function as intended, TransCalls needs permission to access the device call history. You will now be prompted with a request for access. "</string>

@@ -67,6 +67,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/build_version"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -77,6 +80,8 @@
         android:contentDescription="@string/github_page_link_desc"
         android:onClick="openGitHub"
         android:scaleType="fitXY"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="20dp"
         android:src="@drawable/github_mark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
